@@ -9,7 +9,7 @@ from skimage.measure import regionprops
 
 #COMMAND TO CAPTURE THE VIDEO
 
-video= cv2.VideoCapture("D:/Inter/new_1.mp4")
+video= cv2.VideoCapture("New.mp4")
 
 while True:
     
@@ -19,7 +19,7 @@ while True:
     row=orig_frame.shape[0]
     
     if not ret:
-        video=cv2.VideoCapture("D:/Inter/new_1.mp4")
+        video=cv2.VideoCapture("New.mp4")
         continue
 #APPLY GAUSSIAN FILTER TO REMOVE THE NOISE
         
