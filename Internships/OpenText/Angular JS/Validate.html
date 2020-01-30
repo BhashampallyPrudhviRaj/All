@@ -1,0 +1,15 @@
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>  
+<body ng-app="">
+
+<p>Hi, would you like to write something:</p>
+
+<form name="myForm">
+<input name="myInput" ng-model="myInput" required>
+</form>
+
+<p>Did you entered something</p>
+<h1>{{myForm.myInput.$valid}}</h1>
+
+</body>
+</html>

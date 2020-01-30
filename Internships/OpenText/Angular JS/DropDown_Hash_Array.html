@@ -1,0 +1,31 @@
+<html>
+    <head>
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.2.13/angular.min.js"></script>
+        <script>
+            var myApp = angular.module("myApp", []);
+            myApp.controller("myController", function($scope) {
+                $scope.prudhvi = [];
+                $scope.pushInArray = function() {
+                    $scope.prudhvi.push($scope.arrInput);            
+                };
+            });
+        </script>
+    </head>
+    <body>  
+        <div ng-app="myApp" ng-controller="myController">  
+            <form>
+                <input type="text" name="arrExample" ng-model="arrInput"><br>
+                <button ng-click='pushInArray()' >Push</button><br>
+                Array = {{prudhvi}}<br>
+                
+                <select ng-model="abc" ng-options="i for i in prudhvi">                 
+                </select>
+            </form>
+
+            
+            </div>
+        </div>
+        
+    </body> 
+
+</html>

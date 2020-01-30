@@ -1,0 +1,26 @@
+<html>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular-route.js"></script>
+<body ng-app="myApp">
+<p><a href="#/!">Changing Screen to the Self</a></p>
+<a href="Auto_populate_ngmodel.html">Go To Auto Populate values</a><br>
+<a href="Populate_ng_controller.html">Fill Form</a><br>
+<a href="Hash_Array.html">Go To Array of Hashes</a>
+<script>
+var app = angular.module("myApp", ["ngRoute"]);
+app.config(function($routeProvider) {
+    $routeProvider
+    .when("/", {
+        templateUrl : "ChangeScreen.html"
+    })
+    .when("/T1", {
+        templateUrl : "Auto_populate_ngmodel.html"
+    })
+    .when("/T2", {
+        templateUrl : "Populate_ng_controller.html"
+    })
+    ;
+});
+</script>
+</body>
+</html>

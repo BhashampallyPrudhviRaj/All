@@ -1,0 +1,62 @@
+<html ng-app="Myapp">
+    <head>
+        <script src="angular.min.js"></script>
+        
+    </head>
+    <body>
+        <h1>Calculator App </h1>
+        <div ng-controller="myCtrl as ctrl">
+            <input type="text" ng-model="ctrl.input1" ></input>
+            <span ng-bind="ctrl.selectedOperation"></span>
+            <input type="text" ng-model="ctrl.input2" ></input>
+            <button onclick="ctrl.compute()">=</button>
+            <span ng-bind="ctrl.resultValue"></span>
+
+            <p>
+                <button ng-click="ctrl.ButtonClicked('+')">+</button>
+                <button ng-click="ctrl.ButtonClicked('-')">-</button>
+                <button ng-click="ctrl.ButtonClicked('*')">*</button>
+                <button ng-click="ctrl.ButtonClicked('/')">/</button>
+            </p>
+
+        </div>    
+
+        <script>
+            var app = angular.module("Myapp",[]);
+
+app.controller("myCtrl",myCtrl);
+
+function myCtrl(){
+    this.resultValue = 0;
+
+   this.ButtonClicked = function(button){
+    this.selectedOperation = button;
+   }
+    this.compute = function(){
+
+
+        var number1 = parseFloat(this.input1);
+        var number2 = parseFloat(this.input2);
+
+        if(this.selectedOperation ==='+')
+        {
+            this.resultValue = number1 + number2;
+
+        }else   if(this.selectedOperation ==='-')
+        {
+            this.resultValue = number1 - number2; 
+
+        }else   if(this.selectedOperation ==='*')
+        {
+            this.resultValue = number1 * number2;
+
+        }else   if(this.selectedOperation ==='/')
+        {
+            this.resultValue = number1 / number2; 
+        }
+
+    }
+}
+        </script>
+    </body>            
+</html>    

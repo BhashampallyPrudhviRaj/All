@@ -1,0 +1,41 @@
+<html>
+    <head>
+        <link rel="stylesheet" href="C://Users/pbhashampall/Downloads/bootstrap-4.3.1-dist/css/bootstrap.min.css">
+        <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.6.9/angular.min.js"></script>
+        <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+        <script src="C://Users/pbhashampall/Downloads/bootstrap-4.3.1-dist/js/bootstrap.min.js"></script>
+    </head>
+<body ng-app="" style="padding:50px" ng-init="prudhvi=[
+    {name:'Raj', id:01, age:21, dob:'12/8/2009'},
+    {name:'Mahesh', id:02, age:121, dob:'01/12/2179'},
+    {name:'Kiran', id:31, age:251, dob:'01/02/2009'},
+    {name:'Ajay', id:06, age:210, dob:'08/12/2014'}
+]">
+<style>
+        table, td  {
+          border: 1px solid grey;
+          border-collapse: collapse;
+          padding: 5px;
+        }
+</style>
+    <button ng-click="showme=true">Show</button>
+    <button ng-click="showme=false">Hide</button> 
+    
+    <div class="wrapper">
+        <table ng-show="showme" ng-repeat="i in prudhvi">
+        <thead>
+            <tr>
+                <th>{{i.name}}</th>
+            </tr>
+        </thead>
+        <tbody>
+            <tr>
+                <td>{{i.id}}</td>
+                <td>{{i.age}}</td>
+                <td>{{i.dob}}</td>
+            </tr>
+        </tbody>
+        </table>
+    </div>
+</body>
+</html>
