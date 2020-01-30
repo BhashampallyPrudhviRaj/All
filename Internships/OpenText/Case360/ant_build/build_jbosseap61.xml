@@ -1,0 +1,635 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project name="SONORA_JBoss EAP 6.1" default="assemble_and_deploy" basedir=".">
+
+	<property name="script.version" value="0.1"/>
+	<property name="template.present" value="false"/>
+	<property environment="env"/>
+	<property name="base.package" value="com/eistream/sonora"/>
+	<property name="base.utilities.package" value="com/eistream/utilities"/>
+	<taskdef resource="net/sf/antcontrib/antcontrib.properties">
+		<classpath>
+			<pathelement location="${env.ANT_HOME}/lib/ant-contrib-1.0b2.jar"/>
+		</classpath>
+	</taskdef>
+
+
+
+	<!-- =====================================================  -->
+	<!-- start task                                             -->
+	<!-- =====================================================  -->
+
+	<target name="assemble_and_deploy" depends="assemble, deploy"/>
+
+
+
+	<!-- =====================================================  -->
+	<!-- The sequence of build process           -->
+	<!-- =====================================================  -->
+
+	<target name="assemble" depends="init, build">
+		<runtarget target="copy_for_applets"/>
+		<runtarget target="copy_for_utilities"/>
+		<runtarget target="copy_for_support"/>
+		<runtarget target="copy_for_beans"/>
+		<runtarget target="copy_for_servlets"/>
+		<runtarget target="copy_for_metainf"/>
+	</target>
+
+
+
+	<!-- =====================================================  -->
+	<!-- import properties file for concrete server (jboss ..). -->
+	<!-- =====================================================  -->
+
+	<property file="samplebuild_jbosseap61.properties"/>
+
+
+
+
+	<!-- =====================================================  -->
+	<!-- CLASSPATH                                              -->
+	<!-- =====================================================  -->
+
+	<path id="lib.path.ref">
+		<pathelement path="${java.class.path}" />
+		<fileset dir="${env.JAVA_HOME}/jre/lib">
+			<include name="tr.jar"/>
+			<include name="dt.jar"/>
+			<include name="i18n.jar"/>
+			<include name="jaws.jar"/>
+		</fileset>
+		<fileset dir="${src.dir}">
+			<include name="*.jar"/>
+		</fileset>
+		<fileset dir="${env.ANT_HOME}/lib">
+			<include name="*.jar" />
+		</fileset>
+		<fileset dir="${tmp.build.dir}">
+			<include name="**/*Tests.class"/>
+		</fileset>
+	</path>
+
+
+	<!-- =====================================================  -->
+	<!-- Create template if not exist                           -->
+	<!-- =====================================================  -->
+
+	<target name="create.template">
+		<runtarget target="check_if_template_exists"/>
+		<if>
+			<equals arg1="${template.present}" arg2="false" />
+			<then>
+
+				<echo> Create folder sonora.ear </echo>
+				<mkdir dir="${empty.ear.template.location}/${ear.name}"/>
+
+				<echo> Create folders sonora.ear/lib,
+                                   sonora.ear/capture,
+                                   sonora.ear/META-INF,
+                                   sonora.ear/sonoraWeb.war,
+                                   sonora.ear/sonoraWebAPI.war
+				</echo>
+
+				<mkdir dir="${empty.ear.template.location}/${ear.name}/lib"/>
+				<mkdir dir="${empty.ear.template.location}/${ear.name}/capture"/>
+				<mkdir dir="${empty.ear.template.location}/${ear.name}/META-INF"/>
+				<mkdir dir="${empty.ear.template.location}/${ear.name}/sonoraWeb.war"/>
+				<mkdir dir="${empty.ear.template.location}/${ear.name}/sonoraWebAPI.war"/>
+				<mkdir dir="${empty.ear.template.location}/${ear.name}/SonoraBeans.jar"/>
+
+				<unjar src="${src.dir}/Expression.jar" dest="${empty.ear.template.location}/${ear.name}/lib/Expression.jar"/>
+				<unjar src="${src.dir}/ImgUtilities.jar" dest="${empty.ear.template.location}/${ear.name}/lib/ImgUtilities.jar"/>
+				<unjar src="${src.dir}/Utilities.jar" dest="${empty.ear.template.location}/${ear.name}/lib/Utilities.jar"/>
+				<mkdir dir="${empty.ear.template.location}/${ear.name}/lib/SonoraSupport.jar"/>
+				<mkdir dir="${empty.ear.template.location}/${ear.name}/lib/SonoraSupport.jar/META-INF"/>
+
+				<unjar src="${src.dir}/i4web.jar" dest="${empty.ear.template.location}/${ear.name}/lib/SonoraSupport.jar">
+					<patternset>
+						<include name="**/Version.class"/>
+					</patternset>
+				</unjar>
+
+				<unjar src="${src.dir}/jai-i4web.jar" dest="${empty.ear.template.location}/${ear.name}/lib/SonoraSupport.jar">
+					<patternset>
+						<include name="**/Version.class"/>
+					</patternset>
+				</unjar>
+
+				<copy todir="${empty.ear.template.location}/${ear.name}/lib">
+					<fileset dir="${src.dir}">
+						<include name="**/axis-1.4.jar"/>
+						<include name="**/commons-*.jar"/>
+						<include name="**/g360wsdl.jar"/>
+						<include name="**/groovy-all-1.8.6.jar"/>
+						<include name="**/soa-model-core-1.1.1.jar"/>
+						<include name="**/ical4j-1.0-beta5.jar"/>
+						<include name="**/IRMAPI.jar"/>
+						<include name="**/jai_codec-1.1.3.jar"/>
+						<include name="**/jakarta-oro-2.0.7.jar"/>
+						<include name="**/jakarta-poi-*.jar"/>
+						<include name="**/JAL.jar"/>
+						<include name="**/jaxrpc-impl-1.1.3_01.jar"/>
+						<include name="**/jaxrpc-spi-1.1.3_01.jar"/>
+						<include name="**/FastInfoset-1.0.2.jar"/>
+						<include name="**/jaxrpc-api-1.1.jar"/>
+						<include name="**/pvxChart.jar"/>
+						<include name="**/serverChart.jar"/>
+						<include name="**/soap.jar"/>
+						<include name="**/saaj-impl-1.3.20.jar"/>
+						<include name="**/jaxp-ri-1.4.2.jar"/>
+						<include name="**/struts-1.2.8.jar"/>
+						<include name="**/wsrf-xbeans-1.0.jar"/>
+						<include name="**/xbean-jboss6.jar"/>
+						<include name="**/jackson-core-2.9.8.jar"/>
+						<include name="**/jackson-databind-2.9.8.jar"/>
+						<include name="**/jackson-annotations-2.9.8.jar"/>
+						<exclude name="**/xerces-1.4.4.jar"/>
+					</fileset>
+					<fileset dir="${apache.cxf.dir}">
+						<include name="asm-3.3.1.jar"/>
+						<include name="cxf-core-3.0.3.jar"/>
+						<include name="cxf-rt-frontend-jaxrs-3.0.3.jar"/>
+						<include name="cxf-rt-rs-extension-providers-3.0.3.jar"/>
+						<include name="cxf-rt-rs-service-description-3.0.3.jar"/>
+						<include name="cxf-rt-transports-http-3.0.3.jar"/>
+						<include name="javax.ws.rs-api-2.0.1.jar"/>
+						<include name="jettison-1.3.7.jar"/>
+						<include name="xmlschema-core-2.1.0.jar"/>
+						<include name="cxf-rt-ws-policy-3.0.3.jar"/>
+						<include name="neethi-3.0.3.jar"/>
+						<include name="woodstox-core-asl-4.4.1.jar"/>
+						<include name="stax2-api-3.1.4.jar"/>
+					</fileset>
+				</copy>
+
+
+				<copy todir="${empty.ear.template.location}/${ear.name}/sonoraWeb.war">
+					<fileset dir="${src.dir}">
+						<include name="**/Expression.jar"/>
+						<include name="**/i4web.jar"/>
+						<include name="**/i4web.jnlp"/>
+						<include name="**/download.jnlp"/>
+						<include name="**/upload.jnlp"/>
+						<include name="**/print.jnlp"/>
+						<include name="**/myError.html"/>
+						<include name="**/login.jsp"/>
+						<include name="**/ImgUtilities.jar"/>
+						<include name="**/invokeapp.jar"/>
+						<include name="**/jai-i4web.jar"/>
+						<include name="**/morena.jar"/>
+						<include name="**/morena_license.jar"/>
+						<include name="**/morena_windows.jar"/>
+						<include name="**/updownex.jar"/>
+						<include name="**/Utilities.jar"/>
+					</fileset>
+				</copy>
+			</then>
+		</if>
+	</target>
+
+
+	<!-- =====================================================  -->
+	<!-- check if template exists in empty_template dir         -->
+	<!-- =====================================================  -->
+
+	<target name="check_if_template_exists">
+		<available file="${empty.ear.template.location}/${ear.name}" type="dir"
+              property="template.present"/>
+	</target>
+
+
+	<!-- =====================================================  -->
+	<!-- Perform init tasks                                     -->
+	<!-- =====================================================  -->
+
+	<target name="init">
+
+		<echo> *** Start build task *** </echo>
+		<echo> Defined properties: </echo>
+		<echo>    Script version:                    ${script.version}</echo>
+		<echo>    Source dir:                        ${src.dir}</echo>
+		<echo>    Bin dir:                           ${tmp.build.dir}</echo>
+		<echo>    Temp dir for template processing:  ${tmpl.dir}</echo>
+		<echo>    Name of .ear:                      ${ear.name}</echo>
+		<echo>    Location of .ear template:         ${empty.ear.template.location}</echo>
+		<echo>    Deployment dir:                    ${deploy.dir}</echo>
+		<echo>    Install directory of the project:  ${install.dir}</echo>
+		<echo>    ANT_HOME:                          ${env.ANT_HOME}</echo>
+		<!-- echo>    CLASSPATH:                         ${toString:lib.path.ref}</echo -->
+		<echo>    JBOSS_HOME:                        ${env.JBOSS_HOME}</echo>
+
+		<runtarget target="create.template"/>
+		<runtarget target="copy_empty_template"/>
+
+	</target>
+
+
+	<!-- =====================================================  -->
+	<!-- Build                                                  -->
+	<!-- =====================================================  -->
+
+	<target name="build">
+		<!-- check if ant needs to recompile sources ===== -->
+		<if>
+			<equals arg1="${use.ant.for.build}" arg2="1" />
+			<then>
+
+				<if>
+					<equals arg1="${build.only.changes}" arg2="0" />
+					<then>
+						<runtarget target="clean_bin"/>
+					</then>
+				</if>
+
+				<javac fork="true"
+	  	         source="${source.version}"
+	  	         target="${target.version}"
+	  	         classpathref="lib.path.ref"
+	               destdir="${tmp.build.dir}"
+	               srcdir="${src.dir}"
+	               memoryinitialsize="256m"
+	               memorymaximumsize="256m"
+	               nowarn="on" >
+				</javac>
+			</then>
+		</if>
+	</target>
+
+
+
+
+
+
+	<!-- ===================================================================== -->
+	<!--                 build "sonora.ear\lib\SonoraSupport.jar"              -->
+	<!-- ===================================================================== -->
+
+	<property name="tmpl.lib.support" value="lib/SonoraSupport.jar"/>
+	<target name="copy_for_support">
+		<!--delete dir="${tmpl.dir}/${ear.name}/${tmpl.lib.support}/${base.package}"/-->
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.support}/${base.package}">
+			<fileset dir="${tmp.build.dir}/${base.package}">
+				<include name="**/*.class"/>
+				<include name="**/*.properties"/>
+				<include name="**/*.xml"/>
+				<exclude name="**/*Servlet*.class"/>
+				<exclude name="**/*EJB*.class"/>
+				<exclude name="**/*applets*/**/*.*"/>
+			</fileset>
+		</copy>
+
+		<mkdir dir="${tmpl.dir}/${ear.name}/${tmpl.lib.support}"/>
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.support}">
+			<fileset dir="${src.dir}">
+				<include name="**/*.properties" />
+				<include name="**/*.xml" />
+				<exclude name="**/*META-INF*/*.*"/>
+				<exclude name="**/*Build*/*.*"/>
+				<exclude name="**/*Html*/**/*.*"/>
+			</fileset>
+		</copy>
+
+		<copy tofile="${tmpl.dir}/${ear.name}/${tmpl.lib.support}/${base.package}/util/ContextAdapter.properties" file="${src.dir}/${base.package}/util/ContextAdapterJBossEAP61Ear.properties"/>
+	</target>
+
+
+
+	<!-- ********************************************************************* -->
+	<!--                 build "sonora.ear\lib\SonoraBeans.jar"                -->
+	<!-- ********************************************************************* -->
+
+	<property name="tmpl.lib.beans" value="SonoraBeans.jar"/>
+	<target name="copy_target_for_beans">
+		<echo>Directory: ${directory}</echo>
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.beans}/${base.package}/${directory}">
+			<fileset dir="${tmp.build.dir}/${base.package}/${directory}">
+				<include name="**/*EJB*.class"/>
+				<exclude name="**/*applets*/**/*.*"/>
+			</fileset>
+		</copy>
+	</target>
+
+	<target name="copy_for_beans">
+		<!-- delete dir="${tmpl.dir}/${ear.name}/${tmpl.lib.beans}/${base.package}"/ -->
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.beans}/${base.package}">
+			<fileset dir="${tmp.build.dir}/${base.package}">
+				<include name="**/*EJB*.class"/>
+				<exclude name="**/*applets*/**/*.*"/>
+			</fileset>
+		</copy>
+		<copy tofile="${tmpl.dir}/${ear.name}/${tmpl.lib.beans}/META-INF/ejb-jar.xml" file="${src.dir}/META-INF/jbosseap61-ejb-jar.xml"/>
+		<copy tofile="${tmpl.dir}/${ear.name}/${tmpl.lib.beans}/META-INF/jboss-ejb3.xml" file="${src.dir}/META-INF/jbosseap61-ejb3.xml"/>
+		<copy tofile="${tmpl.dir}/${ear.name}/${tmpl.lib.beans}/META-INF/webservices.xml" file="${src.dir}/META-INF/jbosseap61webservices.xml"/>
+		<copy tofile="${tmpl.dir}/${ear.name}/${tmpl.lib.beans}/META-INF/jboss-webservices.xml" file="${src.dir}/META-INF/jbosseap61jboss-webservices.xml"/>
+		<copy tofile="${tmpl.dir}/${ear.name}/${tmpl.lib.beans}/META-INF/WsServiceEJB_mapping.xml" file="${src.dir}/META-INF/jbosseap61WsServiceEJB_mapping.xml"/>
+		<copy tofile="${tmpl.dir}/${ear.name}/${tmpl.lib.beans}/META-INF/MANIFEST.MF" file="${src.dir}/META-INF/MANIFESTJBOSSEAP61.MF"/>
+		<copy tofile="${tmpl.dir}/${ear.name}/${tmpl.lib.beans}/META-INF/wsdl/WsServiceEJB.wsdl" file="${src.dir}/META-INF/wsdl/jbossWsServiceEJB.wsdl"/>
+		<copy tofile="${tmpl.dir}/${ear.name}/${tmpl.lib.beans}/Sonora-roles.properties" file="${install.dir}/jbosseap61/WEB-INF/Sonora-roles.properties"/>
+		<copy tofile="${tmpl.dir}/${ear.name}/${tmpl.lib.beans}/Sonora-users.properties" file="${install.dir}/jbosseap61/WEB-INF/Sonora-users.properties"/>
+	</target>
+
+
+
+	<!-- ********************************************************************* -->
+	<!--                 build "sonora.ear\lib\SonoraServlets.jar"             -->
+	<!-- ********************************************************************* -->
+
+	<property name="tmpl.lib.web" value="sonoraWeb.war"/>
+	<property name="tmpl.lib.webAPI" value="sonoraWebAPI.war"/>
+	<target name="copy_for_servlets">
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}">
+			<fileset dir="${src.dir}/Html/JSP">
+				<include name="**/*.jsp"/>
+				<exclude name="**/*svn*"/>
+			</fileset>
+		</copy>
+		<!-- code to copy the Case360.jnlp to the ear -->
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}/filestore">
+			<fileset dir="${src.dir}/${base.package}/filestore">
+				<include name="Case360.jnlp"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}/Help">
+			<fileset dir="${src.dir}/Html/Help">
+				<include name="**/*.*"/>
+				<exclude name="**/*svn*"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}/Images">
+			<fileset dir="${src.dir}/Html/Images">
+				<include name="**/*.*"/>
+				<exclude name="**/*svn*"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}/Scripts">
+			<fileset dir="${src.dir}/Html/Scripts">
+				<include name="**/*.*"/>
+				<exclude name="**/*svn*"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}/themes">
+			<fileset dir="${src.dir}/Html/themes">
+				<include name="**/*.*"/>
+				<exclude name="**/*svn*"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}/Stylesheets">
+			<fileset dir="${src.dir}/Html/Stylesheets">
+				<include name="**/*.*"/>
+				<exclude name="**/*svn*"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}">
+			<fileset dir="${src.dir}/Html">
+				<include name="*.html"/>
+			</fileset>
+		</copy>
+		
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}">
+					<fileset dir="${src.dir}">
+						<include name="*.jsp"/>
+					</fileset>
+				</copy>
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}">
+					<fileset dir="${src.dir}">
+						<include name="*.html"/>
+					</fileset>
+				</copy>
+		<copy tofile="${tmpl.dir}/${ear.name}/${tmpl.lib.web}/META-INF/MANIFEST.MF" file="${src.dir}/META-INF/MANIFESTJBOSSEAP61.MF"/>
+		<copy tofile="${tmpl.dir}/${ear.name}/${tmpl.lib.webAPI}/META-INF/MANIFEST.MF" file="${src.dir}/META-INF/MANIFESTJBOSSEAP61.MF"/>
+
+
+		<!-- ***** form WEB-INF *****-->
+		<!--delete dir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}/WEB-INF"/-->
+		<mkdir dir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}/WEB-INF"/>
+
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}/WEB-INF/classes/${base.package}">
+			<fileset dir="${tmp.build.dir}/${base.package}">
+				<include name="**/*Servlet*.class"/>
+				<exclude name="**/*applets*/**/*.*"/>
+				<exclude name="**/*svn*"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}/WEB-INF">
+			<fileset dir="${install.dir}/WEB_ROOT/WEB-INF">
+				<include name="**/*.tld"/>
+				<exclude name="**/*applets*/**/*.*"/>
+				<exclude name="**/*svn*"/>
+			</fileset>
+		</copy>
+
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.web}/WEB-INF">
+			<fileset dir="${install.dir}/jbosseap61/WEB-INF">
+				<include name="web.xml"/>
+				<include name="jboss-web.xml"/>
+				<include name="csrfguard.js"/>
+				<include name="csrfguard.properties"/>
+				<include name="csrfguard.tld"/>
+			</fileset>
+		</copy>
+
+		<!--Code to copy servlets to SonoraWebAPI.war-->
+		<mkdir dir="${tmpl.dir}/${ear.name}/${tmpl.lib.webAPI}/WEB-INF"/>
+
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.webAPI}/WEB-INF/classes/${base.package}">
+			<fileset dir="${tmp.build.dir}/${base.package}">
+				<include name="**/*Servlet*.class"/>
+				<exclude name="**/*applets*/**/*.*"/>
+				<exclude name="**/*svn*"/>
+			</fileset>
+		</copy>
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.webAPI}/WEB-INF">
+			<fileset dir="${install.dir}/jbosseap61/WEB-INF/SonoraAPI">
+				<include name="web.xml"/>
+			</fileset>
+		</copy>
+		<copy todir="${tmpl.dir}/${ear.name}/${tmpl.lib.webAPI}/WEB-INF">
+			<fileset dir="${install.dir}/jbosseap61/WEB-INF">
+				<include name="jboss-web.xml"/>
+			</fileset>
+		</copy>
+
+	</target>
+
+	<!-- ******************************************************************************** -->
+	<!-- copy application.xml and jboss-deployment-structure.xml to "sonora.ear\META-INF" -->
+	<!-- ******************************************************************************** -->
+
+	<target name="copy_for_metainf">
+		<copy tofile="${tmpl.dir}/${ear.name}/META-INF/application.xml" file="${install.dir}/jbosseap61/META-INF/application.xml"/>
+		<copy tofile="${tmpl.dir}/${ear.name}/META-INF/jboss-deployment-structure.xml" file="${install.dir}/jbosseap61/META-INF/jboss-deployment-structure.xml"/>
+	</target>
+
+
+	<!-- =====================================================  -->
+	<!-- Copy blanck .ear to {tmpl.dir} dir                     -->
+	<!-- =====================================================  -->
+
+	<target name="copy_empty_template">
+		<!--delete dir="${tmpl.dir}/${ear.name}"/-->
+		<copy todir="${tmpl.dir}">
+			<fileset dir="${empty.ear.template.location}">
+				<include name="**/*.*"/>
+				<exclude name="**/*svn*"/>
+			</fileset>
+		</copy>
+	</target>
+
+
+
+	<!-- =====================================================  -->
+	<!-- check if applicaion exists in deployment dir                                                 -->
+	<!-- =====================================================  -->
+
+	<target name="check_if_application_exists">
+		<available file="${deploy.dir}/${ear.name}" type="dir"
+ 	           property="application.present"/>
+	</target>
+
+
+
+	<!-- =====================================================  -->
+	<!-- Deploy                                                 -->
+	<!-- =====================================================  -->
+
+	<target name="deploy">
+		<runtarget target="check_if_application_exists"/>
+		<if>
+			<equals arg1="${application.present}" arg2="true" />
+			<then>
+				<copy todir="${deploy.dir}">
+					<fileset dir="${tmpl.dir}">
+						<include name="**/*.*"/>
+						<!-- exclude name="**/*.jar"/ -->
+					</fileset>
+				</copy>
+				<if>
+					<equals arg1="${redeploy.app}" arg2="1" />
+					<then>
+						<delete file="${deploy.dir}/${ear.name}.deployed" failonerror="false" />
+						<waitfor maxwait="10" maxwaitunit="second">
+							<available file="${deploy.dir}/${ear.name}.undeployed" />
+						</waitfor>
+						<touch file="${deploy.dir}/${ear.name}.dodeploy" />
+					</then>
+				</if>
+
+			</then>
+			<else>
+				<copy todir="${deploy.dir}">
+					<fileset dir="${tmpl.dir}">
+						<include name="**/*.*"/>
+					</fileset>
+				</copy>
+				<touch file="${deploy.dir}/${ear.name}.dodeploy" />
+			</else>
+		</if>
+	</target>
+
+
+
+
+	<!-- =====================================================  -->
+	<!-- Clean directory with compiled classes                  -->
+	<!-- =====================================================  -->
+
+	<target name="clean_bin">
+		<delete dir="${tmp.build.dir}/com"/>
+		<delete dir="${tmp.build.dir}/test"/>
+	</target>
+
+	<!-- =====================================================  -->
+	<!-- Build applets                                          -->
+	<!-- =====================================================  -->
+
+	<target name="copy_for_applets">
+		<if>
+			<equals arg1="${build.applets}" arg2="1" />
+			<then>
+				<echo>Building applets.</echo>
+				<jar destfile="${empty.ear.template.location}/${ear.name}/sonoraWeb.war/updownex.jar" manifest="${src.dir}/com/eistream/sonora/applets/updown/manifest.txt"
+						basedir="${tmp.build.dir}" includes="com/eistream/sonora/applets/updown/**,com/eistream/sonora/util/Mime**">
+					<fileset dir="${src.dir}/Html">
+						<include name="/Images/icons**"/>
+					</fileset>
+				</jar>
+				<signjar alias="ot256" jar="${empty.ear.template.location}/${ear.name}/sonoraWeb.war/updownex.jar"
+							keystore="${src.dir}/cert256.p12" storetype="pkcs12" keypass="Case360IsTheBest!" storepass="Case360IsTheBest!"/>
+			</then>
+		</if>
+	</target>
+
+	<!-- =====================================================  -->
+	<!-- Build utilities                                          -->
+	<!-- =====================================================  -->
+	<patternset id="utilIncludesExcludesList">
+		<exclude name="${base.utilities.package}/form/**"/>
+		<exclude name="${base.utilities.package}/marks/**"/>
+		<exclude name="${base.utilities.package}/ocr/**"/>
+		<exclude name="${base.utilities.package}/tiff/**"/>
+		<exclude name="${base.utilities.package}/transform/**"/>
+		<exclude name="**/PreBuild.java"/>
+	</patternset>
+
+	<target name="copy_for_utilities">
+		<if>
+			<equals arg1="${build.utilities}" arg2="1" />
+			<then>
+				<echo>Building utilities</echo>
+
+				<!-- Compile Utilities classes -->
+				<if>
+					<equals arg1="${use.ant.for.build}" arg2="1" />
+					<then>
+						<javac fork="true"
+		  	           			source="${source.version}"
+		  	           			target="${target.version}"
+		  	           			classpathref="lib.path.ref"
+		               			destdir="${tmp.utilities.build.dir}"
+		               			srcdir="${src.utilities.dir}"  	
+		               			memoryinitialsize="256m"
+		               			memorymaximumsize="256m"
+		               			nowarn="on">
+							<patternset refid="utilIncludesExcludesList"/>
+						</javac>
+					</then>
+				</if>
+
+				<!-- Jar utilities classes to Utilities.jar -->
+				<jar destfile="${tmpl.dir}/${ear.name}/sonoraWeb.war/Utilities.jar"
+						 basedir="${tmp.utilities.build.dir}"					 
+						 excludes="${base.utilities.package}/expression/**">
+					<patternset refid="utilIncludesExcludesList"/>
+				</jar>
+				<copy todir="${src.dir}">
+					<fileset dir="${tmpl.dir}/${ear.name}/sonoraWeb.war/">
+						<include name="**/Utilities.jar"/>
+					</fileset>
+				</copy>
+				<unjar src="${tmpl.dir}/${ear.name}/sonoraWeb.war/Utilities.jar" dest="${tmpl.dir}/${ear.name}/lib/Utilities.jar"/>
+
+
+				<!-- Jars expressions classes to Expressions.jar -->
+				<jar destfile="${tmpl.dir}/${ear.name}/sonoraWeb.war/Expression.jar"
+						 basedir="${tmp.utilities.build.dir}" 
+						 includes="${base.utilities.package}/expression/**">
+				</jar>
+				<copy todir="${src.dir}">
+					<fileset dir="${tmpl.dir}/${ear.name}/sonoraWeb.war/">
+						<include name="**/Expression.jar"/>
+					</fileset>
+				</copy>
+				<unjar src="${tmpl.dir}/${ear.name}/sonoraWeb.war/Expression.jar" dest="${tmpl.dir}/${ear.name}/lib/Expression.jar"/>
+
+			</then>
+		</if>
+
+	</target>
+</project>
