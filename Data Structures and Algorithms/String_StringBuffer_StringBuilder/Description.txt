@@ -1,0 +1,8 @@
+String:
+String is immutable and whenever we do any operations on strings then new objects are created and old objects are collected by Garbage Collector.
+
+
+StringBuffer and StringBuilder:
+StringBuffer and StringBuilder are almost same and works on the same object which is initially created without creating new objects.
+
+StringBuffer is thread-safe whereas StringBuilder is not thread-safe.
