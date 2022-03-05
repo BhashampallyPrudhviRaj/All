@@ -1,0 +1,3 @@
+This program finds the number of continuous characters while we parse the string
+Ex:  Input: aaabcdd
+Output: 3a1b1c2d
