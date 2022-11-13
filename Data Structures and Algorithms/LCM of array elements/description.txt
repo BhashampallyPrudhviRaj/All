@@ -1,0 +1,27 @@
+Problem
+Given n integers, a0,a1,...an−1.
+
+Find the smallest common multiple (LCM), the smallest positive integer that is divisible by all of them.
+
+###Input:
+
+The first line contains a single integer, T, denoting the number of test cases. The 2*T subsequent lines describe each test query in the following form:
+The first line contains an integer, n denoting the number of elements. The second line contains n space-separated positive integers describing their respective values, a0,a1,...an−1
+ 
+###Output: For each test case, print a single integer denoting the required LCM in a new line
+
+###Constraints
+
+1≤T≤10
+2≤n≤100
+1≤ai≤32
+
+###Subtasks
+
+40 points : n = 2
+60 points : Original constraints
+###Sample Input: 2 2 3 4 5 1 2 3 4 5
+
+###Sample Output: 
+12 
+60
